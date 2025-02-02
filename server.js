@@ -4,6 +4,8 @@ const cors = require("cors");
 const connectDB = require("./db"); // Import the connectDB function
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+
+const path = require("path");
 //====================================================================================================
 // Initialize app
 const app = express();
@@ -24,6 +26,11 @@ const secret_key = process.env.SECRET_KEY;
 if (!secret_key) {
     throw new Error("SECRET_KEY is not defined in the environment variables.");
 }
+
+//====================================================================================================
+// Serve static files from 'public' folder WITHOUT including /public/ in URL
+app.use('/pdf', express.static(path.join(__dirname, 'public/pdf')));
+
 //====================================================================================================
 // User Schema and Model
 const mongoose = require("mongoose");
@@ -118,6 +125,7 @@ app.get("/getUser", authenticateJWT, async (req, res) => {
         res.status(500).json({ error: "Failed to fetch user details" });
     }
 });
+
 //====================================================================================================
 // Health Check
 app.get("/health", (req, res) => {
