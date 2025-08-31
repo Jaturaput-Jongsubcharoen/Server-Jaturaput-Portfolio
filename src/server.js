@@ -1,3 +1,5 @@
+// src/server.js
+
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -140,8 +142,50 @@ app.get("/", (req, res) => {
 app.get("/api", (req, res) => {
     res.json({ fruits: ["apple", "orange", "banana"] });
 });
+
+
+
+/**/
+const sgMail = require("@sendgrid/mail");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+app.post("/api/contact/send", async (req, res) => {
+  const { to, subject, body, replyTo } = req.body || {};
+  if (!to || !subject || !body) return res.status(400).json({ error: "Missing fields" });
+  try {
+    await sgMail.send({
+      to,
+      from: process.env.MAIL_FROM,       // verified sender in SendGrid
+      subject,
+      text: body,
+      replyTo: replyTo || undefined,
+    });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "mail_failed" });
+  }
+});
+
+
+
+
+
 //====================================================================================================
 // Start the Server
 app.listen(8081, () => {
     console.log("Server started on http://localhost:8081");
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
